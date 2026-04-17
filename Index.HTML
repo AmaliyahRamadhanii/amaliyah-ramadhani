@@ -45,7 +45,6 @@
             margin: 5px 0;
         }
 
-        /* Layar Display */
         .display-area {
             background: #fff8fa;
             padding: 20px;
@@ -66,12 +65,10 @@
             font-weight: 400;
             margin: 0;
             text-align: right;
-            word-wrap: break-word;
             width: 100%;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
 
-        /* Navigasi */
         .mode-nav {
             display: flex;
             gap: 10px;
@@ -85,13 +82,12 @@
             border-radius: 15px;
             cursor: pointer;
             font-weight: bold;
-            transition: 0.3s;
+            transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .active { background-color: #f06292; color: white; }
         .inactive { background-color: #fce4ec; color: #ad1457; }
 
-        /* Grid Tombol */
         .btn-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -106,14 +102,15 @@
             font-size: 22px;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.2s;
+            /* Efek halus saat transisi mengecil */
+            transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s;
             display: flex;
             justify-content: center;
             align-items: center;
+            outline: none;
         }
 
-        .btn:active { transform: scale(0.92); }
-
+        /* Skema Warna */
         .light-gray { background-color: #fce4ec; color: #ad1457; }
         .dark-gray { background-color: #ffffff; color: #444; border: 1px solid #f8bbd0; }
         .orange { background-color: #f8bbd0; color: #ad1457; }
@@ -121,7 +118,6 @@
 
         .btn-zero { grid-column: span 2; }
 
-        /* Story Panel */
         #storyPanel {
             display: none;
             flex-direction: column;
@@ -150,7 +146,7 @@
             border-radius: 20px;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(240, 98, 146, 0.3);
+            transition: transform 0.1s;
         }
     </style>
 </head>
@@ -167,48 +163,57 @@
     </div>
 
     <div class="mode-nav">
-        <button id="btnCalc" class="mode-btn active" onclick="showPanel('calc')">Kalkulator</button>
-        <button id="btnStory" class="mode-btn inactive" onclick="showPanel('story')">Soal Cerita</button>
+        <button id="btnCalc" class="mode-btn active" onclick="animateButton(this); showPanel('calc')">Kalkulator</button>
+        <button id="btnStory" class="mode-btn inactive" onclick="animateButton(this); showPanel('story')">Soal Cerita</button>
     </div>
 
     <div id="calcPanel" class="btn-grid">
-        <button class="btn scientific" onclick="append('Math.sin(')">sin</button>
-        <button class="btn scientific" onclick="append('Math.cos(')">cos</button>
-        <button class="btn scientific" onclick="append('Math.tan(')">tan</button>
-        <button class="btn orange" onclick="append('/')">÷</button>
+        <button class="btn scientific" onclick="animateButton(this); append('Math.sin(')">sin</button>
+        <button class="btn scientific" onclick="animateButton(this); append('Math.cos(')">cos</button>
+        <button class="btn scientific" onclick="animateButton(this); append('Math.tan(')">tan</button>
+        <button class="btn orange" onclick="animateButton(this); append('/')">÷</button>
 
-        <button class="btn light-gray" onclick="clearScreen()">AC</button>
-        <button class="btn light-gray" onclick="toggleSign()">+/-</button>
-        <button class="btn light-gray" onclick="append('%')">%</button>
-        <button class="btn orange" onclick="append('*')">×</button>
+        <button class="btn light-gray" onclick="animateButton(this); clearScreen()">AC</button>
+        <button class="btn light-gray" onclick="animateButton(this); toggleSign()">+/-</button>
+        <button class="btn light-gray" onclick="animateButton(this); append('%')">%</button>
+        <button class="btn orange" onclick="animateButton(this); append('*')">×</button>
 
-        <button class="btn dark-gray" onclick="append('7')">7</button>
-        <button class="btn dark-gray" onclick="append('8')">8</button>
-        <button class="btn dark-gray" onclick="append('9')">9</button>
-        <button class="btn orange" onclick="append('-')">-</button>
+        <button class="btn dark-gray" onclick="animateButton(this); append('7')">7</button>
+        <button class="btn dark-gray" onclick="animateButton(this); append('8')">8</button>
+        <button class="btn dark-gray" onclick="animateButton(this); append('9')">9</button>
+        <button class="btn orange" onclick="animateButton(this); append('-')">-</button>
 
-        <button class="btn dark-gray" onclick="append('4')">4</button>
-        <button class="btn dark-gray" onclick="append('5')">5</button>
-        <button class="btn dark-gray" onclick="append('6')">6</button>
-        <button class="btn orange" onclick="append('+')">+</button>
+        <button class="btn dark-gray" onclick="animateButton(this); append('4')">4</button>
+        <button class="btn dark-gray" onclick="animateButton(this); append('5')">5</button>
+        <button class="btn dark-gray" onclick="animateButton(this); append('6')">6</button>
+        <button class="btn orange" onclick="animateButton(this); append('+')">+</button>
 
-        <button class="btn dark-gray" onclick="append('1')">1</button>
-        <button class="btn dark-gray" onclick="append('2')">2</button>
-        <button class="btn dark-gray" onclick="append('3')">3</button>
-        <button class="btn orange" onclick="calculate()">=</button>
+        <button class="btn dark-gray" onclick="animateButton(this); append('1')">1</button>
+        <button class="btn dark-gray" onclick="animateButton(this); append('2')">2</button>
+        <button class="btn dark-gray" onclick="animateButton(this); append('3')">3</button>
+        <button class="btn orange" onclick="animateButton(this); calculate()">=</button>
 
-        <button class="btn dark-gray btn-zero" onclick="append('0')">0</button>
-        <button class="btn dark-gray" onclick="append('.')">,</button>
+        <button class="btn dark-gray btn-zero" onclick="animateButton(this); append('0')">0</button>
+        <button class="btn dark-gray" onclick="animateButton(this); append('.')">,</button>
     </div>
 
     <div id="storyPanel">
-        <textarea id="storyInput" placeholder="Contoh: Ame punya 10 mobil, beli lagi 5. Jadi berapa?"></textarea>
-        <button class="solve-btn" onclick="solveStory()">Dapatkan Jawaban ✨</button>
+        <textarea id="storyInput" placeholder="Contoh: 5 mobil ditambah 2 berapa total mobil tersebut?"></textarea>
+        <button class="solve-btn" onclick="animateButton(this); solveStory()">Dapatkan Jawaban ✨</button>
     </div>
 </div>
 
 <script>
     const screen = document.getElementById('screen');
+
+    // Fungsi ini yang membuat tombol "bergerak" (mengecil lalu kembali)
+    function animateButton(element) {
+        if (!element) return;
+        element.style.transform = "scale(0.85)";
+        setTimeout(() => {
+            element.style.transform = "scale(1)";
+        }, 100);
+    }
 
     function showPanel(type) {
         const calcP = document.getElementById('calcPanel');
@@ -230,7 +235,8 @@
     }
 
     function append(val) {
-        if (screen.innerText === '0' || screen.innerText.includes("adalah")) {
+        const isText = screen.innerText.includes("adalah") || screen.innerText.includes("Amaliyah") || screen.innerText === "Error";
+        if (screen.innerText === '0' || isText) {
             screen.innerText = val;
             screen.style.fontSize = "40px";
         } else {
@@ -251,7 +257,8 @@
 
     function calculate() {
         try {
-            let res = eval(screen.innerText.replace('×', '*').replace('÷', '/'));
+            let expression = screen.innerText.replace(/×/g, '*').replace(/÷/g, '/');
+            let res = eval(expression);
             screen.innerText = Number.isInteger(res) ? res : res.toFixed(2);
         } catch {
             screen.innerText = "Error";
@@ -260,46 +267,44 @@
     }
 
     function solveStory() {
-        const text = document.getElementById('storyInput').value.toLowerCase();
-        const nums = text.match(/\d+(\.\d+)?/g);
+        const input = document.getElementById('storyInput').value.toLowerCase().trim();
+        
+        // 1. Cek Nama
+        if (input.includes("siapa") && input.includes("nama")) {
+            screen.style.fontSize = "25px";
+            screen.innerText = "Nama saya Amaliyah";
+            showPanel('calc');
+            return; 
+        }
+
+        // 2. Logika Hitung Otomatis Kalimat
+        const nums = input.match(/\d+(\.\d+)?/g);
         
         if (!nums || nums.length < 2) {
-            alert("Harap masukkan minimal 2 angka!");
+            alert("Harap masukkan soal dengan minimal 2 angka!");
             return;
         }
 
         const a = parseFloat(nums[0]);
         const b = parseFloat(nums[1]);
         let result = 0;
-        let status = "Total";
-        
-        // Deteksi Kata Benda (mencari kata setelah angka pertama)
-        const words = text.split(/\s+/);
-        const firstNumStr = nums[0];
-        const numIndex = words.findIndex(w => w.includes(firstNumStr));
-        let benda = (numIndex !== -1 && words[numIndex + 1]) ? words[numIndex + 1].replace(/[?.!,]/g, "") : "item";
+        let status = "Totalnya"; 
 
-        // Logika Perhitungan
-        if (text.includes("tambah") || text.includes("beli") || text.includes("dan")) {
-            result = a + b;
-            status = "Total";
-        } else if (text.includes("kurang") || text.includes("sisa") || text.includes("makan") || text.includes("hilang")) {
+        const words = input.split(/\s+/);
+        const indexNum = words.findIndex(w => w.includes(nums[0]));
+        let benda = (indexNum !== -1 && words[indexNum + 1]) ? words[indexNum + 1].replace(/[?.!,]/g, "") : "";
+
+        if (input.includes("kurang") || input.includes("sisa") || input.includes("makan") || input.includes("hilang")) {
             result = a - b;
-            status = "Sisa";
-        } else if (text.includes("kali")) {
-            result = a * b;
-            status = "Hasil kali";
-        } else if (text.includes("bagi")) {
-            result = a / b;
-            status = "Hasil bagi";
+            status = "Sisanya";
         } else {
             result = a + b;
+            status = "Totalnya";
         }
 
-        // TAMPILAN JAWABAN SESUAI PERMINTAAN: "Total adalah 9 mobil"
+        // OUTPUT: "Totalnya adalah 7 mobil"
         screen.style.fontSize = "22px"; 
-        screen.innerText = `${status} ${benda} adalah ${result} ${benda}`;
-        
+        screen.innerText = `${status} adalah ${result} ${benda}`;
         showPanel('calc'); 
     }
 </script>
