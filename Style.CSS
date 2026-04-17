@@ -1,198 +1,117 @@
-/* style.css */
+<script>
+    const screen = document.getElementById('screen');
 
-/* Pengaturan Dasar Body */
-body {
-    background-color: #000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
+    // FUNGSI ANIMASI: Membuat efek tombol 'tindis' (mengecil lalu kembali)
+    function animateButton(element) {
+        if (!element) return;
+        element.style.transform = "scale(0.85)";
+        setTimeout(() => {
+            element.style.transform = "scale(1)";
+        }, 100);
+    }
 
-/* Container Utama ala iPhone */
-.container {
-    width: 350px;
-    background-color: #000;
-    padding: 25px 20px;
-    border-radius: 40px;
-    box-shadow: 0 10px 50px rgba(255, 255, 255, 0.05);
-}
+    function showPanel(type) {
+        const calcP = document.getElementById('calcPanel');
+        const storyP = document.getElementById('storyPanel');
+        const btnC = document.getElementById('btnCalc');
+        const btnS = document.getElementById('btnStory');
 
-/* --- BAGIAN BARU: Identitas Nama --- */
-.user-identity {
-    padding: 10px 10px 0 10px;
-    margin-bottom: 0px;
-}
+        if(type === 'calc') {
+            calcP.style.display = 'grid';
+            storyP.style.display = 'none';
+            btnC.className = 'mode-btn active';
+            btnS.className = 'mode-btn inactive';
+        } else {
+            calcP.style.display = 'none';
+            storyP.style.display = 'flex';
+            btnC.className = 'mode-btn inactive';
+            btnS.className = 'mode-btn active';
+        }
+    }
 
-.user-identity p {
-    color: #8e8e93; /* Abu-abu iOS */
-    font-size: 11px;
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    font-weight: 600;
-}
+    function append(val) {
+        // Jika layar berisi hasil teks, reset saat tombol angka baru ditekan
+        const isText = screen.innerText.includes("adalah") || screen.innerText.includes("Amaliyah") || screen.innerText === "Error";
+        
+        if (screen.innerText === '0' || isText) {
+            screen.innerText = val;
+            screen.style.fontSize = "40px";
+        } else {
+            screen.innerText += val;
+        }
+    }
 
-.user-identity h2 {
-    color: #34c759; /* Hijau Terang iOS */
-    font-size: 20px;
-    margin: 4px 0;
-    font-weight: 700;
-}
+    function clearScreen() { 
+        screen.innerText = '0'; 
+        screen.style.fontSize = "40px";
+    }
 
-/* Area Layar Hasil */
-.display-area {
-    text-align: right;
-    padding: 10px;
-    margin-bottom: 10px;
-    min-height: 90px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: flex-end;
-}
+    function toggleSign() { 
+        if(!isNaN(screen.innerText)) {
+            screen.innerText = parseFloat(screen.innerText) * -1; 
+        }
+    }
 
-#screen {
-    color: white;
-    font-size: 65px; /* Sedikit dikecilkan agar angka panjang tidak pecah */
-    font-weight: 300;
-    margin: 0;
-    white-space: nowrap;
-    overflow-x: auto;
-    /* Menghilangkan scrollbar tapi tetap bisa di-scroll */
-    scrollbar-width: none; 
-}
+    function calculate() {
+        try {
+            let expression = screen.innerText.replace(/×/g, '*').replace(/÷/g, '/');
+            let res = eval(expression);
+            screen.innerText = Number.isInteger(res) ? res : res.toFixed(2);
+            screen.style.fontSize = "40px";
+        } catch {
+            screen.innerText = "Error";
+            setTimeout(clearScreen, 1500);
+        }
+    }
 
-#screen::-webkit-scrollbar {
-    display: none;
-}
+    function solveStory() {
+        const input = document.getElementById('storyInput').value.toLowerCase().trim();
+        
+        // 1. LOGIKA CEK NAMA
+        if (input.includes("siapa") && input.includes("nama")) {
+            screen.style.fontSize = "25px";
+            screen.innerText = "Nama saya Amaliyah";
+            showPanel('calc');
+            return; 
+        }
 
-/* Navigasi Switcher (Kalkulator vs Soal Cerita) */
-.mode-nav {
-    display: flex;
-    background-color: #1c1c1e;
-    padding: 4px;
-    border-radius: 12px;
-    margin-bottom: 25px;
-    gap: 4px;
-}
+        // 2. LOGIKA HITUNG OTOMATIS
+        const nums = input.match(/\d+(\.\d+)?/g);
+        
+        if (!nums || nums.length < 2) {
+            alert("Harap masukkan soal dengan minimal 2 angka!");
+            return;
+        }
 
-.mode-btn {
-    flex: 1;
-    padding: 12px;
-    border: none;
-    border-radius: 9px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+        const a = parseFloat(nums[0]);
+        const b = parseFloat(nums[1]);
+        let result = 0;
+        let status = "Totalnya"; 
 
-.active {
-    background-color: #34c759;
-    color: white;
-}
+        // Deteksi Otomatis Kata Benda (mobil, apel, dll)
+        const words = input.split(/\s+/);
+        const indexNum = words.findIndex(w => w.includes(nums[0]));
+        let benda = (indexNum !== -1 && words[indexNum + 1]) ? words[indexNum + 1].replace(/[?.!,]/g, "") : "item";
 
-.inactive {
-    background-color: transparent;
-    color: #8e8e93;
-}
+        // Logika Operasi (Tambah, Kurang, Kali, Bagi)
+        if (input.includes("kurang") || input.includes("sisa") || input.includes("makan") || input.includes("hilang")) {
+            result = a - b;
+            status = "Sisanya";
+        } else if (input.includes("kali")) {
+            result = a * b;
+            status = "Hasil kalinya";
+        } else if (input.includes("bagi")) {
+            result = a / b;
+            status = "Hasil baginya";
+        } else {
+            result = a + b;
+            status = "Totalnya";
+        }
 
-/* Grid Tombol Kalkulator */
-.btn-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-}
-
-/* Desain Tombol Bulat */
-.btn {
-    border: none;
-    border-radius: 50%;
-    height: 72px;
-    width: 72px;
-    font-size: 28px;
-    font-weight: 400;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: filter 0.2s, transform 0.1s;
-}
-
-.btn:active {
-    filter: brightness(1.4);
-    transform: scale(0.92);
-}
-
-/* Skema Warna Tombol iOS */
-.light-gray { background-color: #a5a5a5; color: black; } 
-.dark-gray { background-color: #333333; color: white; }  
-.orange { background-color: #ff9f0a; color: white; }     
-.scientific { 
-    background-color: #2c2c2e; 
-    color: #34c759; 
-    font-size: 17px; 
-    font-weight: 600;
-}
-
-/* Tombol Nol Spesifik */
-.btn-zero {
-    grid-column: span 2;
-    width: 100%; /* Mengikuti grid span 2 */
-    border-radius: 40px;
-    justify-content: flex-start;
-    padding-left: 28px;
-}
-
-/* Panel Soal Cerita (NLP) */
-#storyPanel {
-    display: none;
-    flex-direction: column;
-    gap: 15px;
-    animation: fadeIn 0.4s ease-out;
-}
-
-textarea {
-    width: 100%;
-    height: 160px;
-    background: #1c1c1e;
-    border: 1px solid #333;
-    border-radius: 20px;
-    color: white;
-    padding: 18px;
-    font-size: 16px;
-    line-height: 1.5;
-    box-sizing: border-box;
-    outline: none;
-    resize: none;
-}
-
-textarea:focus {
-    border-color: #34c759;
-    background: #252527;
-}
-
-.solve-btn {
-    background-color: #34c759;
-    color: white;
-    border: none;
-    padding: 18px;
-    border-radius: 18px;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s, transform 0.2s;
-}
-
-.solve-btn:active {
-    transform: scale(0.98);
-    background-color: #2dad4e;
-}
-
-/* Animasi */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(15px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+        // OUTPUT OTOMATIS: "Totalnya adalah 7 mobil"
+        screen.style.fontSize = "22px"; 
+        screen.innerText = `${status} adalah ${result} ${benda}`;
+        
+        showPanel('calc'); 
+    }
+</script>
