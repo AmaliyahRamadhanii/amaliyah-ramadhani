@@ -102,7 +102,6 @@
             font-size: 22px;
             font-weight: 600;
             cursor: pointer;
-            /* Efek halus saat transisi mengecil */
             transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s;
             display: flex;
             justify-content: center;
@@ -110,7 +109,6 @@
             outline: none;
         }
 
-        /* Skema Warna */
         .light-gray { background-color: #fce4ec; color: #ad1457; }
         .dark-gray { background-color: #ffffff; color: #444; border: 1px solid #f8bbd0; }
         .orange { background-color: #f8bbd0; color: #ad1457; }
@@ -198,7 +196,7 @@
     </div>
 
     <div id="storyPanel">
-        <textarea id="storyInput" placeholder="Contoh: 5 mobil ditambah 2 berapa total mobil tersebut?"></textarea>
+        <textarea id="storyInput" placeholder="Tanya nama atau masukkan soal cerita..."></textarea>
         <button class="solve-btn" onclick="animateButton(this); solveStory()">Dapatkan Jawaban ✨</button>
     </div>
 </div>
@@ -206,7 +204,6 @@
 <script>
     const screen = document.getElementById('screen');
 
-    // Fungsi ini yang membuat tombol "bergerak" (mengecil lalu kembali)
     function animateButton(element) {
         if (!element) return;
         element.style.transform = "scale(0.85)";
@@ -235,7 +232,12 @@
     }
 
     function append(val) {
-        const isText = screen.innerText.includes("adalah") || screen.innerText.includes("Amaliyah") || screen.innerText === "Error";
+        // Mendeteksi jika ada teks hasil di layar agar terhapus saat angka baru ditekan
+        const isText = screen.innerText.includes("adalah") || 
+                       screen.innerText.includes("Amaliyah") || 
+                       screen.innerText.includes("Kami") ||
+                       screen.innerText === "Error";
+        
         if (screen.innerText === '0' || isText) {
             screen.innerText = val;
             screen.style.fontSize = "40px";
@@ -269,17 +271,15 @@
     function solveStory() {
         const input = document.getElementById('storyInput').value.toLowerCase().trim();
         
-        // 1. Cek Nama
+        // --- LOGIKA BARU: JAWABAN 3 NAMA ---
         if (input.includes("siapa") && input.includes("nama")) {
-            screen.style.fontSize = "25px";
-            screen.innerText = "Nama saya Amaliyah";
+            screen.style.fontSize = "18px";
+            screen.innerText = "Kami adalah Amaliyah, Alya, dan Aisyah";
             showPanel('calc');
             return; 
         }
 
-        // 2. Logika Hitung Otomatis Kalimat
         const nums = input.match(/\d+(\.\d+)?/g);
-        
         if (!nums || nums.length < 2) {
             alert("Harap masukkan soal dengan minimal 2 angka!");
             return;
@@ -302,7 +302,6 @@
             status = "Totalnya";
         }
 
-        // OUTPUT: "Totalnya adalah 7 mobil"
         screen.style.fontSize = "22px"; 
         screen.innerText = `${status} adalah ${result} ${benda}`;
         showPanel('calc'); 
